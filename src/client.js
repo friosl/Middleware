@@ -5,20 +5,7 @@ const readline = require('readline').createInterface({
 	output: process.stdout
 });
 
-
-
-readline.question('What is the message', message => {
-var data = JSON.stringify({
-        message
-});
-readline.close();
-console.log(data);
-req.write(data);
-req.end();
-});
-
-
-
+//readline.setPrompt('OHAI> ');
 
 const options = {
   hostname: 'ec2-52-4-113-182.compute-1.amazonaws.com',
@@ -30,6 +17,17 @@ const options = {
    //, 'Content-Length': data.length
   }
 }
+
+var recursiveAsyncReadLine = function () {
+
+readline.question('What is the message? ', message => {
+if (message == 'exit')
+	return readline.close();
+
+var data = JSON.stringify({
+        message
+});
+
 
 const req = https.request(options, res => {
   console.log(`statusCode: ${res.statusCode}`)
@@ -43,4 +41,13 @@ req.on('error', error => {
   console.error(error)
 })
 
+req.write(data);
+req.end();
+
+recursiveAsyncReadLine();
+
+	});
+};
+
+recursiveAsyncReadLine();
 
