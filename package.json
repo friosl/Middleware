@@ -7,8 +7,11 @@
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": " Felipe Rios",
   "license": "ISC",
+  "dependencies": {
+    "kue": "~0.6.2"
+  },
   "devDependencies": {
     "nodemon": "^2.0.7"
   }
