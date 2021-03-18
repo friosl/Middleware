@@ -1,11 +1,12 @@
 const https = require('http')
 
-const readline = require('readline').createInterface({
+
+const rl = require('readline').createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
 
-//readline.setPrompt('OHAI> ');
+
 
 const options = {
   hostname: 'ec2-52-4-113-182.compute-1.amazonaws.com',
@@ -18,17 +19,69 @@ const options = {
   }
 }
 
+
 var recursiveAsyncReadLine = function () {
 
-readline.question('What is the message? ', message => {
+rl.question('What is the message? ', message => {
+
 if (message == 'exit')
 	return readline.close();
+
+var args = message.trim().replace(/  +/g, ' ');
+args = args.split(/\s+/); //Split by space
+
+
+if (args.length >= 2 ){
+	var to_send= "";
+	switch (args[0]) {
+		case "pull":
+			options.path   = '/getMessages'+args[1];
+			options.method = 'GET';
+			break;
+		case "send":
+			console.log("segundo");
+			var element = "";
+			for(var i = 2;i<args.length; i++){
+				 element =  element + args[i]+" ";
+			} 
+			console.log(element);
+			options.path   = '/send';
+			options.method = 'POST';
+			to_send=element;
+			break;
+		case "create":
+			//options.path = '/POST';
+			console.log("create");
+			break;
+		case "delete":
+			//options.path = '/delete'+args[1];
+			console.log("delete");
+			break;
+
+		default:
+			console.log("None of the methods were valid");
+			//recursiveAsyncReadLine(); //Does nothing and writes error, no estoy seguro si esto debería hacerlo así porque volvería a llamar la función , hmm, veremos.
+
+}
+
+/*if (message == 'getAll'){
+	options.path= '/getAllMessages';
+	options.method = 'GET';
+} 
 
 var data = JSON.stringify({
         message
 });
 
+*/
+ // If it enters the switch, then it will do this, right?
+var data = JSON.stringify({
+        to_send
+});
 
+console.log("Creating request as expected");
+
+//console.log(options);
 const req = https.request(options, res => {
   console.log(`statusCode: ${res.statusCode}`)
 
@@ -43,6 +96,11 @@ req.on('error', error => {
 
 req.write(data);
 req.end();
+
+}
+else {
+	console.log("Expected 2 arguments");
+}
 
 recursiveAsyncReadLine();
 
