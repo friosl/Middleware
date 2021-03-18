@@ -64,24 +64,12 @@ if (args.length >= 2 ){
 
 }
 
-/*if (message == 'getAll'){
-	options.path= '/getAllMessages';
-	options.method = 'GET';
-} 
-
-var data = JSON.stringify({
-        message
-});
-
-*/
  // If it enters the switch, then it will do this, right?
 var data = JSON.stringify({
         to_send
 });
 
-console.log("Creating request as expected");
 
-//console.log(options);
 const req = https.request(options, res => {
   console.log(`statusCode: ${res.statusCode}`)
 

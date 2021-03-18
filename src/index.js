@@ -3,20 +3,27 @@ const http = require('http');
 const { bodyParser } = require('./lib/bodyParser');
 let messages = [];
 
+const Queue = require( './queue');
+var colaprueba = new Queue();
+
 async function MessageHandler(req,res) {
 	try {
 		await bodyParser(req);
-		console.log(req.body);
 		messages.push(req.body);
+		//colaprueba.ponerenCola(req.body);
+		//console.log(colaprueba.mostrar());
 		res.writeHead(200,{'Content-Type': 'application/json'});
         	res.write(JSON.stringify({message: 'Mensaje recibido'}));
 	        res.end();
 	}catch(error) {
                 res.writeHead(200,{'Content-Type': 'text/plain'});
-                res.write('Invalid data');
+                res.write(error);
                 res.end();
 
 	}
+	colaprueba.ponerenCola(req.body);
+	console.log("then");
+	console.log(colaprueba.mostrarCola());
 
 }
 function getMessages(req,res) {
