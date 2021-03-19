@@ -29,17 +29,16 @@ if (message == 'exit')
 
 var args = message.trim().replace(/  +/g, ' ');
 args = args.split(/\s+/); //Split by space
-console.log("Esto es args - ");
-console.log(args);
-if(cont = 1 && (args[0] == "login" ||args[0] == "register")){
+
+if(cont == 1 && (args[0] == "login" ||args[0] == "register")){
 	console.log("El argumento es login o register, nice");
         state = (args[0]== "login")?"login":"register"; //Esto funcionará? XD Es un if then else.
 	console.log("Please type username and then password");
-	cont++;
+	++cont;
 }
-else if (cont ==2){
+else if (cont == 2){
 	console.log("Contador es 2.");
-	cont++;
+	++cont;
 	var username = args[0];
 	var password = args[1];
 	var user= false;
@@ -73,16 +72,16 @@ else if (cont ==2){
 			break;
 	}
 }
-else {
 if (args.length >= 2 && cont>2 ){
 	var to_send= "";
+	console.log("llega a alguno de estos no");
 	switch (args[0]) {
 		case "pull":
 			options.path   = '/getMessages'+args[1];
 			options.method = 'GET';
 			break;
 		case "send":
-			console.log("segundo");
+			console.log("aqui debe entrar");
 			var element = "";
 			for(var i = 2;i<args.length; i++){
 				 element =  element + args[i]+" ";
@@ -109,6 +108,7 @@ if (args.length >= 2 && cont>2 ){
 
 }
 if (valid){
+console.log("es valido...") ;
 	var data = JSON.stringify({
         	to_send
 	});
@@ -132,8 +132,8 @@ if (valid){
 }
 else {
 	console.log("Expected 2 arguments or error in typo");
-	}
 }
+
 recursiveAsyncReadLine();
 
 	});
