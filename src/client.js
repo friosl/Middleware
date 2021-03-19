@@ -5,7 +5,7 @@ const rl = require('readline').createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
-
+var AuthUser="";
 
 
 const options = {
@@ -41,12 +41,20 @@ if (args2.length >= 1 ){
  			fs.readFile("auth.txt", 'utf8', (error, datos) => {
    			 if (error) throw error;
 			datos = datos.split(/\n/g);
-			for(var i = 0;i<datos.length; i++){
-                                args2 = datos[i].split(/\s+/);
-				if(username == args2[0] && password[1])
-				user = true;
+                        var i = 0;
+                        while(user == false && i< datos.length){
+				console.log(i);
+				console.log(datos.length);
+                                 args2 = datos[i].split(/\s+/);
+                                if(username == args2[0] && password== args2[1])
+                                user = true;
+                        i++;
                         }
-			console.log(user);
+                        if(user == true){
+                        AuthUser= username
+                        }
+                        console.log(AuthUser);
+
 			});
 			});
                         break;
