@@ -18,6 +18,7 @@ const options = {
    //, 'Content-Length': data.length
   }
 }
+function auth(){
 
 rl.question('login or register ', answer => {
   // TODO: Log the answer in a database
@@ -28,23 +29,21 @@ args2 = args2.split(/\s+/); //Split by space
 if (args2.length >= 1 ){
         switch (args2[0]) {
                 case "login":
-			rl.question('enter username and password ', answer => {
-			  // TODO: Log the answer in a database
-
-		
-			var args2 = answer.trim().replace(/  +/g, ' ');
-			args2 = args2.split(/\s+/); //Split by space
-			var username = args2[0];
-			var password = args2[1];
-			console.log(username + password);
-			var user= false;
- 			fs.readFile("auth.txt", 'utf8', (error, datos) => {
-   			 if (error) throw error;
-			datos = datos.split(/\n/g);
+                        rl.question('enter username and password ', answer => {
+                          // TODO: Log the answer in a database
+                        var args2 = answer.trim().replace(/  +/g, ' ');
+                        args2 = args2.split(/\s+/); //Split by space
+                        var username = args2[0];
+                        var password = args2[1];
+                        console.log(username + password);
+                        var user= false;
+                        fs.readFile("auth.txt", 'utf8', (error, datos) => {
+                         if (error) throw error;
+                        datos = datos.split(/\n/g);
                         var i = 0;
                         while(user == false && i< datos.length){
-				console.log(i);
-				console.log(datos.length);
+                                console.log(i);
+                                console.log(datos.length);
                                  args2 = datos[i].split(/\s+/);
                                 if(username == args2[0] && password== args2[1])
                                 user = true;
@@ -55,8 +54,8 @@ if (args2.length >= 1 ){
                         }
                         console.log(AuthUser);
 
-			});
-			});
+                        });
+                        });
                         break;
                 case "register":
                         console.log("register 2 ");
@@ -66,6 +65,7 @@ if (args2.length >= 1 ){
 }
 }
 });
+}
 var recursiveAsyncReadLine = function () {
 
 
@@ -136,11 +136,10 @@ req.end();
 else {
 	console.log("Expected 2 arguments");
 }
-
 recursiveAsyncReadLine();
 
 	});
 };
-
+auth();
 recursiveAsyncReadLine();
 
