@@ -33,10 +33,11 @@ args = args.split(/\s+/); //Split by space
 if(cont == 1 && (args[0] == "login" ||args[0] == "register")){
         state = (args[0]== "login")?"login":"register"; //If then else case
 	++cont;
+        console.log("Please type username and password in the same line separated by space");
+
 }
 else if (cont == 2){
-	++cont;
-	console.log("Please type username and password in the same line separated by space");
+        console.log("Please type username and password in the same line separated by space");
 	var username = args[0];
 	var password = args[1];
 	var user= false;
@@ -53,13 +54,13 @@ else if (cont == 2){
                         	if(username == args2[0] && password== args2[1]){
                         		user = true;
 					user_id= i;
+					++cont;
 				}
                         	i++;
                         	}
                         	if(user == true){
                         		AuthUser= username;
                         	}
-                        		console.log(AuthUser);
                         	});
 				break;
 			case "register":
@@ -124,13 +125,15 @@ console.log("es valido...") ;
         req.end();
         }
 
-}
 else  {
-	console.log("Expected 2 arguments or error in typo");
-}
+        console.log("Expected 2 arguments or error in typo");
 }
 
 }
+
+
+
+
 recursiveAsyncReadLine();
 
 	});
