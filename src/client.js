@@ -72,28 +72,24 @@ else if (cont == 2){
 				console.log("entro a register");
 				fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
                         if (error) throw error;
-				console.log("leyendo");
-				console.log(datos);
 				text =  datos;
                                 datos = datos.split(/\n/g);
-                        var i = 0;
-                        while(userR == false && i< datos.length){
-                        console.log(username);
-                        console.log(password);
-                                args2 = datos[i].split(/\s+/);
+                        var j = 0;
+                        while(userR == false && j< datos.length){
+                        
+                                args2 = datos[j].split(/\s+/);
                                 if(username == args2[0] && password== args2[1]){
                                         exist=true;
 					userR = true;
-					console.log("encontro");
-					break;
+					
+					
                                 }
-                        i++;
-			if(i = datos.length){
-				exist= false;
-                        }
+                        j++;
 			}
-			console.log(i);
-			console.log("salio");
+			if(j == datos.length){
+                                exist= false;
+                        }
+			
                                 if(exist==false){
 					++cont;
                                         console.log("user unfound");
