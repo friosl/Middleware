@@ -26,22 +26,30 @@ async function MessageHandler(req, res) {
 	//	console.log(colaprueba.mostrarCola());
 
 }
-function getMessages(req, res) {
+async function getMessages(req, res) {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
 	res.write(JSON.stringify(messages));
 	res.end();
 
 }
 
-function createChannel(req, res) {
-	console.log("nombre canal: ");
-	console.log(res);
+async function createChannel(req, res) {
+	
+	console.log("nombre canal creado: ");
+
 }
 
-function deleteChannel(req, res) {
-	console.log("nombre canal: ");
-	console.log(res);	
-}
+async function deleteChannel(req, res) {
+	 try {
+                await bodyParser(req);
+	}catch (error) {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.write(error);
+                res.end();
+	}
+		console.log("nombre canal eliminado: ");
+		console.log(req.body);	
+	}
 
 const server = http.createServer((req, res) => {
 	const { url, method } = req;
@@ -55,27 +63,31 @@ const server = http.createServer((req, res) => {
 				res.writeHead(200, { 'Content-Type': 'application/json' });
 				res.write(JSON.stringify({ message: 'Hello world' }));
 				res.end();
-				break;
+				
 			}
 			if (url === "/getAllMessages") {
 				getMessages(req, res);
-				break;
+				
 			}
-
+			break;
 		//	        case "PUT": Creo que no es necesario porque PUT es actualizar
 
 		case "POST":
 			if (url === "/send") {
 				MessageHandler(req, res);
-				break;
+			
 			}
 			if (url === "/create") {
+				console.log("entro a create");
+                                console.log("es res"+res);
 				createChannel(req, res);
-				break;
+				
 			}
+			break;
 		case "DELETE":
+				if(url === "/delete"){
 				deleteChannel(req, res);
-				res.split("?");
+				}
 				break;
 	}
 

@@ -75,7 +75,7 @@ function auth(username, password) {
 							console.log("user registered");
 							user_id = j;
 						}
-					});					
+					});
 				}
 			});
 			break;
@@ -86,9 +86,11 @@ function createRequest(args) {
 	valid = true; //Confirmar si el mensaje es válido
 	var to_send = "";
 	let command= args[0];
+	var data = "";
+	let channel = args[1];
 	switch (command) {
 		case "pull":
-			options.path = '/getMessages' + args[1];
+			options.path = '/getMessages';
 			options.method = 'GET';
 			break;
 		case "send":
@@ -99,13 +101,15 @@ function createRequest(args) {
 			options.path = '/send';
 			options.method = 'POST';
 			to_send = element;
+
 			break;
 		case "create":
-			options.path = "/create"+"?"+args[1];
+			options.path = "/create";
 			options.method = 'POST';
+			data = JSON.stringify({channel});
 			break;
 		case "delete":
-			options.path = '/delete'+"?"+args[1];
+			options.path = '/delete';
 			options.method = 'DELETE';
 			break;
 
@@ -116,10 +120,9 @@ function createRequest(args) {
 	}
 
 	if (valid) {
-		var data = JSON.stringify({
-			to_send, user_id: user_id
-		});
-
+		let data = (command=="send")?  JSON.stringify({ channel,user_id, to_send}) : JSON.stringify({channel,user_id});
+		data['user_id']= user_id;
+		console.log(data);
 		const req = https.request(options, res => {
 			console.log(`statusCode: ${res.statusCode}`)
 
