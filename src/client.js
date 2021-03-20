@@ -33,14 +33,14 @@ args = args.split(/\s+/); //Split by space
 if(cont == 1 && (args[0] == "login" ||args[0] == "register")){
         state = (args[0]== "login")?"login":"register"; //If then else case
 	++cont;
-        console.log("Please type username and password in the same line separated by space");
-
+       console.log("Please type username and password in the same line separated by space");
 }
 else if (cont == 2){
         console.log("Please type username and password in the same line separated by space");
 	var username = args[0];
 	var password = args[1];
 	var user= false;
+	var text="";
 	switch (state) {
 		case "login":
 			fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
@@ -60,11 +60,56 @@ else if (cont == 2){
                         	}
                         	if(user == true){
                         		AuthUser= username;
-                        	}
+					console.log("user found \n");
+                        	}else{
+					console.log("user unfound \n");
+				}
                         	});
 				break;
 			case "register":
-				console.log("register");
+				var exist;
+				var userR=false;
+				console.log("entro a register");
+				fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
+                        if (error) throw error;
+				console.log("leyendo");
+				console.log(datos);
+				text =  datos;
+                                datos = datos.split(/\n/g);
+                        var i = 0;
+                        while(userR == false && i< datos.length){
+                        console.log(username);
+                        console.log(password);
+                                args2 = datos[i].split(/\s+/);
+                                if(username == args2[0] && password== args2[1]){
+                                        exist=true;
+					userR = true;
+					console.log("encontro");
+					break;
+                                }
+                        i++;
+			if(i = datos.length){
+				exist= false;
+                        }
+			}
+			console.log(i);
+			console.log("salio");
+                                if(exist==false){
+					++cont;
+                                        console.log("user unfound");
+					text = text + username + " "+ password+ "\n" ;
+					fs.writeFile("/home/ec2-user/Proyecto1/src/auth.txt",text,'utf8', function (err){
+					if(err){
+						console.err(err);
+					}else{
+						console.log("user registered");
+					}
+					});
+                                }if(exist==true){
+                                        console.log("user exist");
+                                }
+
+			});
 				break;
 			}
 }
