@@ -1,15 +1,15 @@
 const http = require('http');
 
 const { bodyParser } = require('./lib/bodyParser');
-let messages = [];
+//let messages = [];
 
 const Queue = require( './queue');
-var colaprueba = new Queue();
+//var colaprueba = new Queue();
 
 async function MessageHandler(req,res) {
 	try {
 		await bodyParser(req);
-		messages.push(req.body);
+//		messages.push(req.body);
 		//colaprueba.ponerenCola(req.body);
 		//console.log(colaprueba.mostrar());
 		res.writeHead(200,{'Content-Type': 'application/json'});
@@ -21,9 +21,9 @@ async function MessageHandler(req,res) {
                 res.end();
 
 	}
-	colaprueba.ponerenCola(req.body);
-	console.log("then");
-	console.log(colaprueba.mostrarCola());
+//	colaprueba.ponerenCola(req.body);
+//	console.log("then");
+//	console.log(colaprueba.mostrarCola());
 
 }
 function getMessages(req,res) {
