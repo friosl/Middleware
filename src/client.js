@@ -1,126 +1,109 @@
 const https = require('http')
 const fs = require("fs")
 
-const rl = require('readline').createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
-var AuthUser="";
-var cont=1;
-var state= "";
-var user_id=0;
+const rl = require('readline').createInterface({ input: process.stdin, output: process.stdout });
+var AuthUser = "";
+var cont = 1;
+var state = "";
+var user_id = 0;
 const options = {
-  hostname: 'ec2-52-4-113-182.compute-1.amazonaws.com',
-  port: 3000,
-  path: '/send',
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-   //, 'Content-Length': data.length
-  }
+	hostname: 'ec2-52-4-113-182.compute-1.amazonaws.com',
+	port: 3000,
+	path: '/send',
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json'
+	}
 }
 
-
-var recursiveAsyncReadLine = function () {
-rl.question('What do you want to do?', message => {
-
-if (message == 'exit')
-	return rl.close();
-
-var args = message.trim().replace(/  +/g, ' ');
-args = args.split(/\s+/); //Split by space
-
-if(cont == 1 && (args[0] == "login" ||args[0] == "register")){
-        state = (args[0]== "login")?"login":"register"; //If then else case
+function log_res(text) {
+	state = (text == "login") ? "login" : "register"; //If then else case
 	++cont;
-       console.log("Please type username and password in the same line separated by space");
+	console.log("Please type username and password in the same line separated by space");
 }
-else if (cont == 2 && args.length == 2 ){
-	var username = args[0];
-	var password = args[1];
-	var user= false;
-	var text="";
+
+function auth(username, password) {
+	var user = false;
+	var text = "";
 	switch (state) {
 		case "login":
 			fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
-                	if (error) throw error;
-                		datos = datos.split(/\n/g);
-                	var i = 0;
-               	 	while(user == false && i< datos.length){
-                	//console.log(i);
-                        //console.log(datos.length);
-                        	args2 = datos[i].split(/\s+/);
-                        	if(username == args2[0] && password== args2[1]){
-                        		user = true;
-					user_id= i;
-					++cont;
+				if (error) throw error;
+				datos = datos.split(/\n/g);
+				var i = 0;
+				while (user == false && i < datos.length) {
+					args2 = datos[i].split(/\s+/);
+					if (username == args2[0] && password == args2[1]) {
+						user = true;
+						user_id = i;
+						++cont;
+					}
+					i++;
 				}
-                        	i++;
-                        	}
-                        	if(user == true){
-                        		AuthUser= username;
+				if (user == true) {
+					AuthUser = username;
 					console.log("Log-in success");
-                        	}else{
+				} else {
 					console.log("User unfound");
 				}
-                        	});
-				break;
-			case "register":
-				var exist;
-				var userR=false;
-				fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
-                        if (error) throw error;
-				text =  datos;
-                                datos = datos.split(/\n/g);
-                        var j = 0;
-                        while(userR == false && j< datos.length){
-                        
-                                args2 = datos[j].split(/\s+/);
-                                if(username == args2[0]){
-                                        exist=true;
-					userR = true;
-					cont=1;
-					console.log("Please, say what you want to do, if login or register");
-                                }
-                       		j++;
-			}
-			if(j == datos.length && userR==false){
-                                exist= false;
-                        }
-                                if(exist==false){
-					++cont;
-					text = text + username + " "+ password+ "\n" ;
-					fs.writeFile("/home/ec2-user/Proyecto1/src/auth.txt",text,'utf8', function (err){
-					if(err){
-						console.err(err);
-					}else{
-						console.log("user registered");
+			});
+			break;
+		case "register":
+			var exist;
+			var userR = false;
+			fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
+				if (error) throw error;
+				text = datos;
+				datos = datos.split(/\n/g);
+				var j = 0;
+				while (userR == false && j < datos.length) {
+
+					args2 = datos[j].split(/\s+/);
+					if (username == args2[0]) {
+						exist = true;
+						userR = true;
+						cont = 1;
+						console.log("Please, say what you want to do, if login or register");
 					}
+					j++;
+				}
+				if (j == datos.length && userR == false) {
+					exist = false;
+				}
+				if (exist == false) {
+					++cont;
+					text = text + username + " " + password + "\n";
+					fs.writeFile("/home/ec2-user/Proyecto1/src/auth.txt", text, 'utf8', function (err) {
+						if (err) {
+							console.err(err);
+						} else {
+							console.log("user registered");
+						}
 					});
-                                }
+				}
 
 			});
-				break;
-			}
+			break;
+	}
 }
-if (args.length >= 2 && cont>2 ){
-	valid=true; //Confirmar si el mensaje es válido
-	var to_send= "";
-	switch (args[0]) {
+
+function createRequest(args) {
+	valid = true; //Confirmar si el mensaje es válido
+	var to_send = "";
+	let command= args[0];
+	switch (command) {
 		case "pull":
-			options.path   = '/getMessages'+args[1];
+			options.path = '/getMessages' + args[1];
 			options.method = 'GET';
 			break;
 		case "send":
-			console.log("aqui debe entrar");
 			var element = "";
-			for(var i = 2;i<args.length; i++){
-				 element =  element + args[i]+" ";
-			} 
-			console.log(element);
-			options.path   = '/send';
+			for (var i = 2; i < args.length; i++) {
+				element = element + args[i] + " ";
+			}
+			options.path = '/send';
 			options.method = 'POST';
-			to_send=element;
+			to_send = element;
 			break;
 		case "create":
 			//options.path = '/POST';
@@ -132,49 +115,60 @@ if (args.length >= 2 && cont>2 ){
 			break;
 
 		default:
-			valid=false;
+			valid = false;
 			console.log("None of the methods were valid");
 			break;
-			//recursiveAsyncReadLine(); //Does nothing and writes error?
 	}
 
-if (valid){
-console.log("es valido...") ;
-        var data = JSON.stringify({
-                to_send
-        });
+	if (valid) {
+		console.log("es valido...");
+		var data = JSON.stringify({
+			to_send
+		});
 
+		const req = https.request(options, res => {
+			console.log(`statusCode: ${res.statusCode}`)
 
-        const req = https.request(options, res => {
-        console.log(`statusCode: ${res.statusCode}`)
+			res.on('data', d => {
+				process.stdout.write(d)
+			})
+		})
+		req.on('error', error => {
+			console.error(error)
+		})
 
-        res.on('data', d => {
-          process.stdout.write(d)
-          })
-        })
-        req.on('error', error => {
-          console.error(error)
-        })
+		req.write(data);
+		req.end();
+	}
 
-        req.write(data);
-        req.end();
-        }
-
-else  {
-        console.log(
-	"Valid messages: \n send <channel> <Message>\n create <channel>\n delete <channel> \n get <channel>  "); 
-      }
+	else {
+		console.log(
+			"Valid messages: \n send <channel> <Message>\n create <channel>\n delete <channel> \n get <channel>  ");
+	}
 
 }
 
+var recursiveAsyncReadLine = function () {
+	rl.question('What do you want to do?', message => {
+		if (message == 'exit')
+			return rl.close();
+		var args = message.trim().replace(/  +/g, ' ');
+		args = args.split(/\s+/); //Split by space
 
-
-
-recursiveAsyncReadLine();
-
+		if (cont == 1 && (args[0] == "login" || args[0] == "register")) {
+			log_res(args[0]);
+		}
+		else if (cont == 2 && args.length == 2) {
+			var username = args[0];
+			var password = args[1];
+			auth(username,password);
+		}
+		if (args.length >= 2 && cont > 2) {
+			createRequest(args);
+		}
+		recursiveAsyncReadLine();
 	});
 };
-
 
 recursiveAsyncReadLine();
 
