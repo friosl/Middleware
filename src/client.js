@@ -49,7 +49,6 @@ function auth(username, password) {
 			});
 			break;
 		case "register":
-			var exist;
 			var userR = false;
 			fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
 				if (error) throw error;
@@ -60,7 +59,6 @@ function auth(username, password) {
 
 					args2 = datos[j].split(/\s+/);
 					if (username == args2[0]) {
-						exist = true;
 						userR = true;
 						cont = 1;
 						console.log("Please, say what you want to do, if login or register");
@@ -68,9 +66,6 @@ function auth(username, password) {
 					j++;
 				}
 				if (j == datos.length && userR == false) {
-					exist = false;
-				}
-				if (exist == false) {
 					++cont;
 					text = text + username + " " + password + "\n";
 					fs.writeFile("/home/ec2-user/Proyecto1/src/auth.txt", text, 'utf8', function (err) {
@@ -78,10 +73,10 @@ function auth(username, password) {
 							console.err(err);
 						} else {
 							console.log("user registered");
+							user_id = j;
 						}
-					});
+					});					
 				}
-
 			});
 			break;
 	}
@@ -106,24 +101,23 @@ function createRequest(args) {
 			to_send = element;
 			break;
 		case "create":
-			//options.path = '/POST';
-			console.log("create");
+			options.path = "/create"+"?"+args[1];
+			options.method = 'POST';
 			break;
 		case "delete":
-			//options.path = '/delete'+args[1];
-			console.log("delete");
+			options.path = '/delete'+"?"+args[1];
+			options.method = 'DELETE';
 			break;
 
 		default:
 			valid = false;
-			console.log("None of the methods were valid");
+			console.log("Command not valid");
 			break;
 	}
 
 	if (valid) {
-		console.log("es valido...");
 		var data = JSON.stringify({
-			to_send
+			to_send, user_id: user_id
 		});
 
 		const req = https.request(options, res => {
