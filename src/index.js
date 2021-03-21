@@ -1,11 +1,10 @@
 const http = require('http');
 
 const { bodyParser } = require('./lib/bodyParser');
-//let messages = [];
+let messages = [];
 
 const Queue = require('./queue');
 //var colaprueba = new Queue();
-
 async function MessageHandler(req, res) {
 	try {
 		await bodyParser(req);
@@ -21,6 +20,13 @@ async function MessageHandler(req, res) {
 		res.end();
 
 	}
+	
+        let channel = req.body.channel;
+        let user_id = req.body.user_id;
+	let message = req.body.to_send;
+
+        console.log("nombre canal creado: "+channel+ " por el usuario "+ user_id+ " mensaje " + message);
+
 	//	colaprueba.ponerenCola(req.body);
 	//	console.log("then");
 	//	console.log(colaprueba.mostrarCola());
@@ -32,29 +38,38 @@ async function getMessages(req, res) {
 	res.end();
 
 }
-
 async function createChannel(req, res) {
-	
-	console.log("nombre canal creado: ");
+        try {
+                await bodyParser(req);
+        }
+        catch (error) {
+                console.log("error en bodyP");
+        }
+        let channel = req.body.channel;
+        let user_id = req.body.user_id;
+
+
+	console.log("nombre canal creado: "+channel+ " por el usuario "+ user_id);
+
 
 }
 
 async function deleteChannel(req, res) {
-	 try {
+        try {
                 await bodyParser(req);
-	}catch (error) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.write(error);
-                res.end();
-	}
-		console.log("nombre canal eliminado: ");
-		console.log(req.body);	
-	}
+        }
+        catch (error) {
+                console.log("error en bodyP");
+        }
+        let channel = req.body.channel;
+        let user_id = req.body.user_id;
 
+	console.log("nombre canal eliminado: " );	
+	}
 const server = http.createServer((req, res) => {
 	const { url, method } = req;
 
-	//LOGGER
+
 	console.log(`URL: ${url} - Method: ${method}`);
 
 	switch (method) {
@@ -73,14 +88,13 @@ const server = http.createServer((req, res) => {
 		//	        case "PUT": Creo que no es necesario porque PUT es actualizar
 
 		case "POST":
+			console.log(url);
 			if (url === "/send") {
 				MessageHandler(req, res);
 			
 			}
 			if (url === "/create") {
-				console.log("entro a create");
-                                console.log("es res"+res);
-				createChannel(req, res);
+				createChannel(req,res);
 				
 			}
 			break;
@@ -88,7 +102,7 @@ const server = http.createServer((req, res) => {
 				if(url === "/delete"){
 				deleteChannel(req, res);
 				}
-				break;
+			break;
 	}
 
 })
