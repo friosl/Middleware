@@ -86,7 +86,6 @@ function createRequest(args) {
 	valid = true; //Confirmar si el mensaje es válido
 	var to_send = "";
 	let command= args[0];
-	var data = "";
 	let channel = args[1];
 	switch (command) {
 		case "pull":
@@ -106,11 +105,10 @@ function createRequest(args) {
 		case "create":
 			options.path = "/create";
 			options.method = 'POST';
-			data = JSON.stringify({channel});
 			break;
 		case "delete":
 			options.path = '/delete';
-			options.method = 'DELETE';
+			options.method = 'POST';
 			break;
 
 		default:

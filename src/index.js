@@ -64,7 +64,7 @@ async function deleteChannel(req, res) {
         let channel = req.body.channel;
         let user_id = req.body.user_id;
 
-	console.log("nombre canal eliminado: " );	
+	console.log("nombre canal eliminado: "+channel + "por el usuario" + user_id );
 	}
 const server = http.createServer((req, res) => {
 	const { url, method } = req;
@@ -78,34 +78,27 @@ const server = http.createServer((req, res) => {
 				res.writeHead(200, { 'Content-Type': 'application/json' });
 				res.write(JSON.stringify({ message: 'Hello world' }));
 				res.end();
-				
 			}
 			if (url === "/getAllMessages") {
 				getMessages(req, res);
-				
 			}
 			break;
 		//	        case "PUT": Creo que no es necesario porque PUT es actualizar
 
 		case "POST":
-			console.log(url);
 			if (url === "/send") {
 				MessageHandler(req, res);
-			
 			}
 			if (url === "/create") {
 				createChannel(req,res);
-				
 			}
-			break;
-		case "DELETE":
-				if(url === "/delete"){
+			if (url === "/delete"){
 				deleteChannel(req, res);
-				}
+			}
 			break;
 	}
 
-})
+});
 
 server.listen(3000);
 console.log('Server on port', 3000);
