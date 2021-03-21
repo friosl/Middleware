@@ -33,7 +33,9 @@ function auth(username, password) {
 				var i = 0;
 				while (user == false && i < datos.length) {
 					args2 = datos[i].split(/\s+/);
-					if (username == args2[0] && password == args2[1]) {
+					var passwordDecode = args2[1];
+					passwordDecode = decode(passwordDecode);
+					if (username == args2[0] && password == passwordDecode) {
 						user = true;
 						user_id = i;
 						++cont;
@@ -67,6 +69,7 @@ function auth(username, password) {
 				}
 				if (j == datos.length && userR == false) {
 					++cont;
+					password=encode(password);
 					text = text + username + " " + password + "\n";
 					fs.writeFile("/home/ec2-user/Proyecto1/src/auth.txt", text, 'utf8', function (err) {
 						if (err) {
@@ -81,7 +84,14 @@ function auth(username, password) {
 			break;
 	}
 }
-
+function encode(message){
+	var encode = Buffer.from(message).toString('base64');
+	return encode; 
+}
+function decode(encode){
+	var decode = Buffer.from(encode,'base64').toString();
+	return decode; 
+}
 function createRequest(args) {
 	valid = true; //Confirmar si el mensaje es válido
 	var to_send = "";
