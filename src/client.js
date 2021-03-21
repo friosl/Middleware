@@ -26,15 +26,15 @@ function auth(username, password) {
 	var user = false;
 	var text = "";
 	switch (state) {
-		case "login":
-			fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
+		case "login": fs.readFile("/home/ec2-user/Proyecto1/src/auth.txt", 'utf8', (error, datos) => {
 				if (error) throw error;
 				datos = datos.split(/\n/g);
 				var i = 0;
-				while (user == false && i < datos.length) {
+				while (user == false && i < datos.length-1) {
 					args2 = datos[i].split(/\s+/);
 					var passwordDecode = args2[1];
 					passwordDecode = decode(passwordDecode);
+
 					if (username == args2[0] && password == passwordDecode) {
 						user = true;
 						user_id = i;
@@ -98,7 +98,7 @@ function createRequest(args) {
 	let command= args[0];
 	let channel = args[1];
 	switch (command) {
-		case "pull":
+		case "get":
 			options.path = '/getMessages';
 			options.method = 'POST';
 			break;
@@ -128,6 +128,8 @@ function createRequest(args) {
 	}
 
 	if (valid) {
+		channel=encode(channel);
+		to_send=encode(to_send);
 		let data = (command=="send")?  JSON.stringify({ channel,user_id, to_send}) : JSON.stringify({channel,user_id});
 		data['user_id']= user_id;
 		console.log(data);

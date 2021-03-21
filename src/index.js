@@ -8,6 +8,16 @@ var Queue = require('queue');
 var channelMap = new Hashmap();
 var channelOwner = new Hashmap();
 
+function encode(message){
+        var encode = Buffer.from(message).toString('base64');
+        return encode;
+}
+function decode(encode){
+        var decode = Buffer.from(encode,'base64').toString();
+        return decode;
+}
+
+
 async function MessageHandler(req, res) {
 	try {
 		await bodyParser(req);
@@ -23,6 +33,8 @@ async function MessageHandler(req, res) {
         let channel = req.body.channel;
         let user_id = req.body.user_id;
 	let message = req.body.to_send;
+	channel = decode(channel);
+	message = decode(message);
 	if(channelMap.has(channel) === true) {
 		if(channelMap.get(channel).has(user_id) === false) {
 			channelMap.get(channel).set(user_id, new Queue());
@@ -52,6 +64,7 @@ async function getMessages(req, res) {
         }
         let channel = req.body.channel;
         let user_id = req.body.user_id;
+	channel = decode(channel);
         if (channelMap.has(channel)){
 		if (channelMap.get(channel).has(user_id)) {
 			messages = channelMap.get(channel).get(user_id)['jobs'];
@@ -76,12 +89,14 @@ async function createChannel(req, res) {
         }
         let channel = req.body.channel;
         let user_id = req.body.user_id;
+	channel = decode(channel);
 	if (channelMap.has(channel)=== false){
 		channelMap.set(channel, new Hashmap());
-		channelMap.get(channel).set(user_id, new Queue());}
+		channelMap.get(channel).set(user_id, new Queue());
 		channelOwner.set(channel,user_id);
 		console.log("nombre canal creado: "+channel+ " por el usuario "+ user_id);
-	else {
+	}
+	else{
 		console.log("channel exists");
 	}
 }
@@ -95,8 +110,9 @@ async function deleteChannel(req, res) {
         }
         let channel = req.body.channel;
         let user_id = req.body.user_id;
+	channel = decode(channel);
 	if (channelMap.has(channel)){
-		if (channelOwner.get(channel) === user_id)? channelMap.delete(channel): console.log("Usted no es el dueño");
+		channelOwner.get(channel) === user_id? channelMap.delete(channel): console.log("Usted no es el dueño");
 		//If then else
 	}
 	else {
@@ -108,8 +124,7 @@ async function deleteChannel(req, res) {
 
 const server = http.createServer((req, res) => {
 	const { url, method } = req;
-
-
+	
 	console.log(`URL: ${url} - Method: ${method}`);
 
 	switch (method) {
