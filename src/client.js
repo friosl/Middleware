@@ -90,7 +90,7 @@ function createRequest(args) {
 	switch (command) {
 		case "pull":
 			options.path = '/getMessages';
-			options.method = 'GET';
+			options.method = 'POST';
 			break;
 		case "send":
 			var element = "";
