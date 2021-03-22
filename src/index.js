@@ -26,7 +26,7 @@ async function requestFromClient(req) {
 }
 
 async function sendMessageHandler(req, res) {
-	requestFromClient(req);
+	req = await requestFromClient(req,res);
 	let channel = req.body.channel;
 	let user_id = req.body.user_id;
 	let message = req.body.to_send;
@@ -49,7 +49,7 @@ async function sendMessageHandler(req, res) {
 	}
 }
 async function getMessages(req, res) {
-	requestFromClient(req);
+	req = await requestFromClient(req,res);
 	let channel = req.body.channel;
 	let user_id = req.body.user_id;
 	channel = decode(channel);
@@ -73,7 +73,7 @@ async function getMessages(req, res) {
 }
 
 async function createChannel(req, res) {
-	requestFromClient(req);
+	req = await requestFromClient(req,res);
 	let channel = req.body.channel;
 	let user_id = req.body.user_id;
 	channel = decode(channel);
@@ -91,7 +91,7 @@ async function createChannel(req, res) {
 }
 
 async function deleteChannel(req, res) {
-	requestFromClient(req);
+	req = await requestFromClient(req,res);
 	let channel = req.body.channel;
 	let user_id = req.body.user_id;
 	channel = decode(channel);
