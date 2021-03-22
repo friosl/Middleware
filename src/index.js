@@ -8,132 +8,106 @@ var Queue = require('queue');
 var channelMap = new Hashmap();
 var channelOwner = new Hashmap();
 
-function encode(message){
-        var encode = Buffer.from(message).toString('base64');
-        return encode;
+function decode(encode) {
+	var decode = Buffer.from(encode, 'base64').toString();
+	return decode;
 }
-function decode(encode){
-        var decode = Buffer.from(encode,'base64').toString();
-        return decode;
-}
-
-
-async function MessageHandler(req, res) {
+async function requestFromClient(req) {
 	try {
 		await bodyParser(req);
 		res.writeHead(200, { 'Content-Type': 'application/json' });
-	} catch (error) {
+	}
+	catch (error) {
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.write(error);
 		res.end();
-
 	}
-        let channel = req.body.channel;
-        let user_id = req.body.user_id;
+	return req;
+}
+
+async function sendMessageHandler(req, res) {
+	requestFromClient(req);
+	let channel = req.body.channel;
+	let user_id = req.body.user_id;
 	let message = req.body.to_send;
 	channel = decode(channel);
 	message = decode(message);
-	if(channelMap.has(channel) === true) {
-		if(channelMap.get(channel).has(user_id) === false) {
+	if (channelMap.has(channel) === true) {
+		if (channelMap.get(channel).has(user_id) === false) {
 			channelMap.get(channel).set(user_id, new Queue());
 		}
 		let keys = channelMap.get(channel).keys();
-		//console.log(channelMap.get(channel).get(user_id));
-		for(i = 0; i < keys.length;i++) {
-			j= keys[i];
+		for (i = 0; i < keys.length; i++) {
+			j = keys[i];
 			channelMap.get(channel).get(j).push(message);
 		}
-                res.write(JSON.stringify({ message: 'Mensaje enviado' }));
-                res.end();
-	}else{
-		res.write(JSON.stringify({"El canal no existe" : channel}));
+		res.write(JSON.stringify({ message: 'Mensaje enviado' }));
+		res.end();
+	} else {
+		res.write(JSON.stringify({ "El canal no existe": channel }));
 		res.end();
 	}
-
 }
 async function getMessages(req, res) {
-        try {
-                await bodyParser(req);
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-        } catch (error) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.write(error);
-                res.end();
-
-        }
-        let channel = req.body.channel;
-        let user_id = req.body.user_id;
+	requestFromClient(req);
+	let channel = req.body.channel;
+	let user_id = req.body.user_id;
 	channel = decode(channel);
-        if (channelMap.has(channel)){
+	if (channelMap.has(channel)) {
 		if (channelMap.get(channel).has(user_id)) {
 			messages = channelMap.get(channel).get(user_id)['jobs'];
-			res.write(JSON.stringify({messages}));
+			res.write(JSON.stringify({ messages }));
 			res.end();
 		}
-                else {
-                	res.write(JSON.stringify({"No está suscrito a canal, creando cola" : channel}));
-                	res.end();
-			channelMap.get(channel).set(user_id,new Queue());
+		else {
+			res.write(JSON.stringify({ "No está suscrito a canal, creando cola": channel }));
+			res.end();
+			channelMap.get(channel).set(user_id, new Queue());
 		}
-        }
+	}
 	else {
-                res.write(JSON.stringify({"No existe" : channel}));
-                res.end();
+		res.write(JSON.stringify({ "No existe": channel }));
+		res.end();
 	}
 
 }
 
 async function createChannel(req, res) {
-        try {
-                await bodyParser(req);
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-        }
-        catch (error) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.write(error);
-                res.end();
-        }
-        let channel = req.body.channel;
-        let user_id = req.body.user_id;
+	requestFromClient(req);
+	let channel = req.body.channel;
+	let user_id = req.body.user_id;
 	channel = decode(channel);
-	if (channelMap.has(channel)=== false){
+	if (channelMap.has(channel) === false) {
 		channelMap.set(channel, new Hashmap());
 		channelMap.get(channel).set(user_id, new Queue());
-		channelOwner.set(channel,user_id);
-		res.write(JSON.stringify({"Se creó el canal" : channel}));
+		channelOwner.set(channel, user_id);
+		res.write(JSON.stringify({ "Se creó el canal": channel }));
 		res.end();
 	}
-	else{
-		res.write(JSON.stringify({"Ya existe" : channel}));
+	else {
+		res.write(JSON.stringify({ "Ya existe": channel }));
 		res.end();
 	}
 }
 
 async function deleteChannel(req, res) {
-        try {
-                await bodyParser(req);
-        }
-        catch (error) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.write(error);
-                res.end();
-        }
-        let channel = req.body.channel;
-        let user_id = req.body.user_id;
+	requestFromClient(req);
+	let channel = req.body.channel;
+	let user_id = req.body.user_id;
 	channel = decode(channel);
-	if (channelMap.has(channel)){
-		if (channelOwner.get(channel) === user_id){
+	if (channelMap.has(channel)) {
+		if (channelOwner.get(channel) === user_id) {
 			channelMap.delete(channel);
-			res.write(JSON.stringify({"Se eliminó el canal": channel}));
+			res.write(JSON.stringify({ "Se eliminó el canal": channel }));
 			res.end();
 		}
-		else{
-			res.write(JSON.stringify({"No tiene permiso para eliminar: " : channel})); //If then else
+		else {
+			res.write(JSON.stringify({ "No tiene permiso para eliminar: ": channel })); //If then else
 			res.end();
 		}
 	}
 	else {
-		res.write(JSON.stringify({"No existe el canal": channel}));
+		res.write(JSON.stringify({ "No existe el canal": channel }));
 		res.end();
 	}
 
@@ -154,17 +128,17 @@ const server = http.createServer((req, res) => {
 
 		case "POST":
 			if (url === "/send") {
-				MessageHandler(req, res);
+				sendMessageHandler(req, res);
 			}
-			if (url === "/create") {
-				createChannel(req,res);
+			else if (url === "/create") {
+				createChannel(req, res);
 			}
-			if (url === "/delete"){
+			else if (url === "/delete") {
 				deleteChannel(req, res);
 			}
-			if (url === "/getMessages") {
-				getMessages(req,res);
-}
+			else if (url === "/getMessages") {
+				getMessages(req, res);
+			}
 			break;
 	}
 

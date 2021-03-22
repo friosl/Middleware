@@ -16,6 +16,15 @@ const options = {
 	}
 }
 
+function encode(message){
+	var encode = Buffer.from(message).toString('base64');
+	return encode; 
+}
+function decode(encode){
+	var decode = Buffer.from(encode,'base64').toString();
+	return decode; 
+}
+
 function log_res(text) {
 	state = (text == "login") ? "login" : "register"; //If then else case
 	++cont;
@@ -84,14 +93,7 @@ function auth(username, password) {
 			break;
 	}
 }
-function encode(message){
-	var encode = Buffer.from(message).toString('base64');
-	return encode; 
-}
-function decode(encode){
-	var decode = Buffer.from(encode,'base64').toString();
-	return decode; 
-}
+
 function createRequest(args) {
 	valid = true; //Confirmar si el mensaje es válido
 	var to_send = "";
@@ -154,7 +156,7 @@ function createRequest(args) {
 
 }
 
-var recursiveAsyncReadLine = function () {
+var recursiveReadInput = function () {
 	rl.question('What do you want to do?', message => {
 		if (message == 'exit')
 			return rl.close();
@@ -172,9 +174,9 @@ var recursiveAsyncReadLine = function () {
 		if (args.length >= 2 && cont > 2) {
 			createRequest(args);
 		}
-		recursiveAsyncReadLine();
+		recursiveReadInput();
 	});
 };
 
-recursiveAsyncReadLine();
+recursiveReadInput();
 
