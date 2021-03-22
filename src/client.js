@@ -46,7 +46,7 @@ function auth(username, password) {
 					AuthUser = username;
 					console.log("Log-in success");
 				} else {
-					console.log("User unfound");
+					console.log("User unfound or incorrect password");
 				}
 			});
 			break;
@@ -132,9 +132,8 @@ function createRequest(args) {
 		to_send=encode(to_send);
 		let data = (command=="send")?  JSON.stringify({ channel,user_id, to_send}) : JSON.stringify({channel,user_id});
 		data['user_id']= user_id;
-		console.log(data);
 		const req = https.request(options, res => {
-			console.log(`statusCode: ${res.statusCode}`)
+			//console.log(`statusCode: ${res.statusCode}`)
 
 			res.on('data', d => {
 				process.stdout.write(d)

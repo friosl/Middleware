@@ -22,8 +22,6 @@ async function MessageHandler(req, res) {
 	try {
 		await bodyParser(req);
 		res.writeHead(200, { 'Content-Type': 'application/json' });
-		res.write(JSON.stringify({ message: 'Mensaje recibido' }));
-		res.end();
 	} catch (error) {
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.write(error);
@@ -45,8 +43,11 @@ async function MessageHandler(req, res) {
 			j= keys[i];
 			channelMap.get(channel).get(j).push(message);
 		}
+                res.write(JSON.stringify({ message: 'Mensaje enviado' }));
+                res.end();
 	}else{
-		console.log("El canal no existe");
+		res.write(JSON.stringify({"El canal no existe" : channel}));
+		res.end();
 	}
 
 }
@@ -54,8 +55,6 @@ async function getMessages(req, res) {
         try {
                 await bodyParser(req);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                //res.write(JSON.stringify({ message: 'Mensaje recibido' }));
-                res.end();
         } catch (error) {
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
                 res.write(error);
@@ -68,14 +67,18 @@ async function getMessages(req, res) {
         if (channelMap.has(channel)){
 		if (channelMap.get(channel).has(user_id)) {
 			messages = channelMap.get(channel).get(user_id)['jobs'];
-			console.log(messages);
+			res.write(JSON.stringify({messages}));
+			res.end();
 		}
                 else {
-			console.log("No esta suscrito");
+                	res.write(JSON.stringify({"No está suscrito a canal, creando cola" : channel}));
+                	res.end();
+			channelMap.get(channel).set(user_id,new Queue());
 		}
         }
 	else {
-		console.log("El canal no existe");
+                res.write(JSON.stringify({"No existe" : channel}));
+                res.end();
 	}
 
 }
@@ -83,9 +86,12 @@ async function getMessages(req, res) {
 async function createChannel(req, res) {
         try {
                 await bodyParser(req);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
         }
         catch (error) {
-                console.log("error en bodyP");
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.write(error);
+                res.end();
         }
         let channel = req.body.channel;
         let user_id = req.body.user_id;
@@ -94,10 +100,12 @@ async function createChannel(req, res) {
 		channelMap.set(channel, new Hashmap());
 		channelMap.get(channel).set(user_id, new Queue());
 		channelOwner.set(channel,user_id);
-		console.log("nombre canal creado: "+channel+ " por el usuario "+ user_id);
+		res.write(JSON.stringify({"Se creó el canal" : channel}));
+		res.end();
 	}
 	else{
-		console.log("channel exists");
+		res.write(JSON.stringify({"Ya existe" : channel}));
+		res.end();
 	}
 }
 
@@ -106,25 +114,33 @@ async function deleteChannel(req, res) {
                 await bodyParser(req);
         }
         catch (error) {
-                console.log("error en bodyP");
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.write(error);
+                res.end();
         }
         let channel = req.body.channel;
         let user_id = req.body.user_id;
 	channel = decode(channel);
 	if (channelMap.has(channel)){
-		channelOwner.get(channel) === user_id? channelMap.delete(channel): console.log("Usted no es el dueño");
-		//If then else
+		if (channelOwner.get(channel) === user_id){
+			channelMap.delete(channel);
+			res.write(JSON.stringify({"Se eliminó el canal": channel}));
+			res.end();
+		}
+		else{
+			res.write(JSON.stringify({"No tiene permiso para eliminar: " : channel})); //If then else
+			res.end();
+		}
 	}
 	else {
-		console.log("El canal no existe");
+		res.write(JSON.stringify({"No existe el canal": channel}));
+		res.end();
 	}
 
-	console.log("nombre canal eliminado: "+channel + "por el usuario" + user_id );
 }
 
 const server = http.createServer((req, res) => {
 	const { url, method } = req;
-	
 	console.log(`URL: ${url} - Method: ${method}`);
 
 	switch (method) {
