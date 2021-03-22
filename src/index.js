@@ -12,7 +12,7 @@ function decode(encode) {
 	var decode = Buffer.from(encode, 'base64').toString();
 	return decode;
 }
-async function requestFromClient(req) {
+async function requestFromClient(req,res) {
 	try {
 		await bodyParser(req);
 		res.writeHead(200, { 'Content-Type': 'application/json' });
