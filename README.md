@@ -1,7 +1,7 @@
 # Middleware
 
 ## API REST:
-![](https://i.imgur.com/You0GWP.jpg)
+![](https://i.imgur.com/GVbLTgs.jpg)
 
 
 ## RELACIÓN CANAL - USUARIOS:
