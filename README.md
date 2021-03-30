@@ -1,3 +1,3 @@
 # Middleware
 
-!(image)[https://imgur.com/You0GWP]
+![](https://imgur.com/You0GWP)
